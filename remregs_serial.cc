@@ -2,7 +2,7 @@
  * \file   remregs_serial.cpp
  * \brief  Class for accessing the a register bank over a UART (RS-232, USB converter or local)
  * \author Alessandro Crespi & Jeremie Knuesel
- * \date   August 2016
+ * \date   August 2016, updated May 2020
  */
 
 #include <iostream>
@@ -165,6 +165,10 @@ bool CSerialRemoteRegs::open(const char* portname, int speed)
   // Save old serial port configuration to keep it on exit
   tcgetattr(fd, &oldtio);
 
+  // Disable HUPCL flag on previous port state (if present) to prevent
+  // rebooting a connected Arduino on subsequent open() calls
+  oldtio.c_cflag &= ~HUPCL;
+
   // Set the new configuration: specified baud rate, no parity, 8 bits
   struct termios iop;
   memset(&iop, 0, sizeof(iop));
@@ -223,7 +227,7 @@ bool CSerialRemoteRegs::do_sync()
   write_n(file, &b, 1);
   do {
     if (!read_n(file, &b, 1)) {
-      wperror("read_n");
+//      wperror("read_n");   // typically a timeout error, don't display an error message from system
       return false;
     }
   } while (b != 0xAA && b != 0x55);      // accepts both 0xAA (BioRob radio interface) and 0x55 (as implemented by ARM-side of radio protocol or Arduino version)
