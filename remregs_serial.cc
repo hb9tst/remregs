@@ -127,7 +127,7 @@ bool CSerialRemoteRegs::open(const char* portname, int speed)
   dcb.Parity = NOPARITY;
   dcb.StopBits = ONESTOPBIT;
   dcb.fRtsControl = RTS_CONTROL_ENABLE;  // enable RTS line in case the device requires it
-  dcb.fDtrControl = DTR_CONTROL_ENABLE;  // this causes Arduinos to reboot, might be wanted or not, but that's what happens on Linux anyway
+  dcb.fDtrControl = DTR_CONTROL_DISABLE; // disables DTR line and leaves it disabled on close
   dcb.fBinary = TRUE;                    // Win32 only supports binary data on comm ports anyway
   dcb.fOutX = dcb.fInX = FALSE;          // no in-band flow control (XON/XOFF)
   dcb.fNull = FALSE;                     // don't discard NULL bytes

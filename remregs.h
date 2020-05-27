@@ -5,14 +5,14 @@
  * \file   remregs.h
  * \brief  Abstract class for register operations
  * \author Alessandro Crespi & Jeremie Knuesel
- * \date   June 2016
+ * \date   June 2016, updated May 2020
  */
 
 #include <stdint.h>
 
 
 /** Abstract class for a register bank with 8-bit, 16-bit, 32-bit and "multibyte"
-  * (arbitrary length up to 29 bytes) registers.
+  * (arbitrary length, maximum length depending on remote platform) registers.
   */
 class CRemoteRegs
 {
@@ -24,7 +24,7 @@ public:
 
   /// \brief Opens the connection to the register bank
   /// \param portname Filename of the device to open (for local ports) or host name (for remote interfaces)
-  /// \param param Baud rate to use (local ports) or TCP port number (for remote interfaces)
+  /// \param param Baud rate to use (local ports) or TCP port number (for TCP-based remote interfaces)
   virtual bool open(const char* portname, int param) = 0;
 
   /// Synchronizes the communication between the PC and the interface  
@@ -128,8 +128,13 @@ protected:
   /// multibyte register write
   static const uint8_t ROP_WRITE_MB = 7;
 
+#ifndef REMREGS_MAX_MB_SIZE
   /// maximum size of a multibyte register
-  static const uint8_t MAX_MB_SIZE = 29;
+  static const uint8_t MAX_MB_SIZE = 128;
+#else
+  static const uint8_t MAX_MB_SIZE = REMREGS_MAX_MB_SIZE;
+#endif
+
 };
 
 #endif
